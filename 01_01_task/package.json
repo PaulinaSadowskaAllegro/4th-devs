@@ -1,8 +1,8 @@
 {
-  "name": "01_01_structured",
+  "name": "01_01_task",
   "version": "1.0.0",
   "type": "module",
-  "description": "Structured outputs example",
+  "description": "Task 01.01",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"

@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import {
@@ -170,6 +170,10 @@ async function main() {
 
   const output = { task: "people", answer, apikey: process.env.AI_DEVS_API_KEY };
   console.log(`\n${JSON.stringify(output, null, 2)}`);
+
+  const outputPath = join(__dirname, "output.json");
+  writeFileSync(outputPath, JSON.stringify(output, null, 2), "utf-8");
+  console.log(`\nOutput saved to ${outputPath}`);
 
   const verifyResponse = await fetch("https://hub.ag3nts.org/verify", {
     method: "POST",
