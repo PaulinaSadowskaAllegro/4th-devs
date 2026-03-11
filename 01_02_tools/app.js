@@ -13,7 +13,7 @@ import {
   logQuestion,
 } from "./helper.js";
 
-const model = resolveModelForProvider("gpt-4.1-mini");
+const model = resolveModelForProvider("openai/gpt-oss-120b");
 
 // `buildResponsesRequest()` maps this to OpenAI web search or OpenRouter online mode.
 const webSearch = true;
@@ -137,6 +137,7 @@ const chat = async (conversation) => {
   let stepsRemaining = MAX_TOOL_STEPS;
 
   while (stepsRemaining > 0) {
+    console.log(`Steps remaining: ${stepsRemaining} ${JSON.stringify(currentConversation)}`);
     stepsRemaining -= 1;
 
     const response = await requestResponse(currentConversation);

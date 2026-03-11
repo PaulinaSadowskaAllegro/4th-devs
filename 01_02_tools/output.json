@@ -1,0 +1,26 @@
+{
+    "id": "fc_tmp_pob4risdhtm",
+    "type": "function_call",
+    "status": "completed",
+    "call_id": "chatcmpl-tool-a232b481d61b05d8",
+    "name": "get_weather",
+    "arguments": "{\n  \"location\": \"Kraków\"\n}"
+},
+{
+    "type": "function_call_output",
+    "call_id": "chatcmpl-tool-a232b481d61b05d8",
+    "output": "{\"temp\":-2,\"conditions\":\"snow\"}"
+},
+{
+    "id": "fc_tmp_i72iyps2gl",
+    "type": "function_call",
+    "status": "completed",
+    "call_id": "chatcmpl-tool-4eb13d3d5b05406c8706e547ad0bf9a0",
+    "name": "send_email",
+    "arguments": "{\n  \"to\": \"student@example.com\",\n  \"subject\": \"Current Weather in Kraków\",\n  \"body\": \"Hello,\\n\\nThe current weather in Kraków is snow with a temperature of -2°C.\\n\\nBest regards.\"\n}"
+},
+{
+    "type": "function_call_output",
+    "call_id": "chatcmpl-tool-4eb13d3d5b05406c8706e547ad0bf9a0",
+    "output": "{\"success\":true,\"status\":\"sent\",\"to\":\"student@example.com\",\"subject\":\"Current Weather in Kraków\",\"body\":\"Hello,\\n\\nThe current weather in Kraków is snow with a temperature of -2°C.\\n\\nBest regards.\"}"
+}

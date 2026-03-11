@@ -50,6 +50,8 @@ export const processQuery = async (query, { model, tools, handlers, instructions
       return text;
     }
 
+    console.log(` Model called ${JSON.stringify(toolCalls)}`);
+
     const toolResults = await executeToolCalls(toolCalls, handlers);
 
     conversation = [
