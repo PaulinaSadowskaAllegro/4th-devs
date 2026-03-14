@@ -8,7 +8,7 @@ import {
   resolveModelForProvider
 } from "../config.js";
 import { extractResponseText } from "./helpers.js";
-import { fetchAccessLevel, fetchSuspectLocations } from "./locationApi.js";
+import { fetchAccessLevel, fetchSuspectLocations, fetchCityCoordinates } from "./locationApi.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -20,8 +20,74 @@ async function saveOutput(output, filename) {
   console.log(`\nOutput saved to ${outputPath}`);
 }
 
-async function verify() {
-  const output = { task: "findhim", answer: [], apikey: process.env.AI_DEVS_API_KEY };
+async function extractIfSuspectWasNearPlant(text) {
+  const response = await fetch(RESPONSES_API_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${AI_API_KEY}`,
+      ...EXTRA_API_HEADERS
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      input: `You are given a suspect's recorded GPS coordinates and a list of power plant locations (also as GPS coordinates).
+
+Your task:
+1. For each of the suspect's recorded locations, calculate the distance to every power plant using the Haversine formula to account for Earth's curvature.
+2. Find the single closest power plant across all recorded locations.
+3. Set "decision" to true if the suspect was ever within 5 km of any power plant, otherwise false.
+4. Set "closest" to the shortest distance (in meters) between any of the suspect's locations and any power plant.
+5. Set "closestPlant" to the name of the power plant that was closest to any of the suspect's locations.
+
+Input data (JSON): ${text}`,
+      text: { format: plantSchema }
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.error) {
+    const message = data?.error?.message ?? `Request failed with status ${response.status}`;
+    throw new Error(message);
+  }
+
+  const outputText = extractResponseText(data);
+
+  if (!outputText) {
+    throw new Error("Missing text output in API response");
+  }
+
+  return JSON.parse(outputText);
+}
+
+const plantSchema = {
+  type: "json_schema",
+  name: "plant_location_closeness",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      decision: {
+        type: "boolean",
+        description: "True if the suspect was ever within 5 km of any power plant, otherwise false."
+      },
+      closest: {
+        type: ["number", "null"],
+        description: "Distance in meters to the closest power plant across all of the suspect's recorded locations. Use null if unclear."
+      },
+      closestPlant: {
+        type: ["string", "null"],
+        description: "Name of the power plant that was closest to any of the suspect's recorded locations. Use null if unclear."
+      }
+    },
+    required: ["decision", "closest", "closestPlant"],
+    additionalProperties: false
+  }
+};
+
+
+async function verify(answer) {
+  const output = { task: "findhim", answer: answer, apikey: process.env.AI_DEVS_API_KEY };
   console.log(`\n${JSON.stringify(output, null, 2)}`);
 
   const verifyResponse = await fetch("https://hub.ag3nts.org/verify", {
@@ -58,10 +124,48 @@ async function buildSusLocationsFile() {
   saveOutput(results, "susLocations.json");
 }
 
+async function buildPlantLocationsFile(locations) {
+  const cityCoords = await Promise.all(
+    Object.keys(locations).map(async (city) => {
+      const [result] = await fetchCityCoordinates(city);
+      return { city, lat: result?.lat, lon: result?.lon };
+    })
+  );
+  console.log("City coordinates:", JSON.stringify(cityCoords, null, 2));
+  await saveOutput(cityCoords, "city_coords.json");
+}
+
 async function main() {
   // buildSusLocationsFile();
-  const susLocations = loadFromFile("susLocations.json");
-  const locations = loadFromFile("findhim_locations.json").power_plants;
+  // buildPlantLocationsFile(locations);
+ /* const susLocations = loadFromFile("susLocations.json");
+  const plants = loadFromFile("findhim_locations.json").power_plants;
+  const locations = loadFromFile("city_coords.json");
+
+  const decisions = await Promise.all(
+    susLocations.map(async (suspect) => {
+      const input = { suspect, plantsLocations: locations };
+      const decision = await extractIfSuspectWasNearPlant(JSON.stringify(input));
+      return { name: suspect.name, surname: suspect.surname, ...decision };
+    })
+  );
+
+  console.log(`\nFinal decisions: ${JSON.stringify(decisions, null, 2)}`);
+
+  await saveOutput(decisions, "final_decisions.json");*/
+
+  const suspect = loadFromFile("final_decisions.json");
+  const plants = loadFromFile("findhim_locations.json").power_plants;
+  const answer = {
+    "name": suspect.name,
+    "surname": suspect.surname,
+    "accessLevel": "7",
+    "powerPlant": plants[suspect.closestPlant].code,
+  };
+
+  console.log(`\nAnswer: ${JSON.stringify(answer, null, 2)}`);
+
+  verify(answer);
 }
 
 main().catch((error) => {

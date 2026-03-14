@@ -1,4 +1,43 @@
 const LOCATION_ENDPOINT = "https://hub.ag3nts.org/api/location";
+const GEOCODE_ENDPOINT = "https://nominatim.openstreetmap.org/search";
+
+/**
+ * Fetches latitude/longitude coordinates for a given city name.
+ * @param {string} city
+ * @returns {Promise<{ lat: string, lon: string, display_name: string }[]>}
+ */
+export async function fetchCityCoordinates(city) {
+  if (!city) {
+    throw new Error("`city` is required.");
+  }
+
+  const url = new URL(GEOCODE_ENDPOINT);
+  url.searchParams.set("q", city);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("limit", "1");
+
+  const response = await fetch(url.toString(), {
+    headers: { "User-Agent": "todo" }
+  });
+
+  const raw = await response.text();
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    data = raw;
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Geocode API error ${response.status}: ${typeof data === "string" ? data : JSON.stringify(data)}`
+    );
+  }
+
+  return data;
+}
+
+
 
 /**
  * Fetches coordinates where a suspect was seen.
