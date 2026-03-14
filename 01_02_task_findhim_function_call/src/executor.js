@@ -41,6 +41,7 @@ export const processQuery = async (query, { model, tools, handlers, instructions
   let conversation = [{ role: "user", content: query }];
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    console.log(`\n--- Round ${round + 1} ---`);
     const response = await chat({ ...chatConfig, input: conversation });
     const toolCalls = extractToolCalls(response);
 

@@ -39,3 +39,9 @@ export function loadFromFile(filename) {
   const content = readFileSync(path, "utf-8");
   return JSON.parse(content);
 }
+
+export async function saveOutput(output, filename) {
+  const outputPath = join(__dirname, filename);
+  writeFileSync(outputPath, JSON.stringify(output, null, 2), "utf-8");
+  console.log(`\nOutput saved to ${outputPath}`);
+}
