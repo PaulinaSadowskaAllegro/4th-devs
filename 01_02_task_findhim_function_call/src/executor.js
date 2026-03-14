@@ -33,8 +33,8 @@ const executeToolCalls = async (toolCalls, handlers) => {
   );
 };
 
-export const processQuery = async (query, { model, tools, handlers, instructions }) => {
-  const chatConfig = { model, tools, instructions };
+export const processQuery = async (query, { model, tools, handlers, instructions, text }) => {
+  const chatConfig = { model, tools, instructions, text };
   logQuery(query);
   // Each example query is isolated. We keep conversation state
   // only within the current query while the model is calling tools.

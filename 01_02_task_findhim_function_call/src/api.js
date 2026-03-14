@@ -1,11 +1,12 @@
 import { AI_API_KEY, EXTRA_API_HEADERS, RESPONSES_API_ENDPOINT } from "../../config.js";
 
-export const chat = async ({ model, input, tools, toolChoice = "auto", instructions }) => {
+export const chat = async ({ model, input, tools, toolChoice = "auto", instructions, text }) => {
   const body = { model, input };
 
   if (tools) body.tools = tools;
   if (tools) body.tool_choice = toolChoice;
   if (instructions) body.instructions = instructions;
+  if (text) body.text = text;
 
   const response = await fetch(RESPONSES_API_ENDPOINT, {
     method: "POST",

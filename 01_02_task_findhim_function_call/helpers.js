@@ -42,6 +42,7 @@ export function loadFromFile(filename) {
 
 export async function saveOutput(output, filename) {
   const outputPath = join(__dirname, filename);
-  writeFileSync(outputPath, JSON.stringify(output, null, 2), "utf-8");
+  const data = typeof output === "string" ? JSON.parse(output) : output;
+  writeFileSync(outputPath, JSON.stringify(data, null, 2), "utf-8");
   console.log(`\nOutput saved to ${outputPath}`);
 }
