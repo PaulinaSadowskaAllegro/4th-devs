@@ -75,5 +75,58 @@ export const tools = [
       additionalProperties: false
     },
     strict: true
+  },
+  {
+    type: "function",
+    name: "findClosestSuspectToPlant",
+    description: "Compares all suspect GPS locations against all power plant GPS coordinates using precise spherical earth (Haversine) distance calculation. Returns the suspect who was ever geographically closest to any plant, along with the plant name, plant code, and the shortest distance in meters. Use this whenever you need to find which suspect was nearest to a power plant.",
+    parameters: {
+      type: "object",
+      properties: {
+        suspects: {
+          type: "array",
+          description: "Array of suspects with their recorded locations, as returned by fetchSuspectLocations",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              surname: { type: "string" },
+              locations: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    lat: { type: "string" },
+                    lon: { type: "string" }
+                  },
+                  required: ["lat", "lon"],
+                  additionalProperties: false
+                }
+              }
+            },
+            required: ["name", "surname", "locations"],
+            additionalProperties: false
+          }
+        },
+        plants: {
+          type: "array",
+          description: "Array of plant coordinates, as returned by fetchCityCoordinates",
+          items: {
+            type: "object",
+            properties: {
+              city: { type: "string" },
+              code: { type: "string" },
+              lat: { type: "string" },
+              lon: { type: "string" }
+            },
+            required: ["city", "code", "lat", "lon"],
+            additionalProperties: false
+          }
+        }
+      },
+      required: ["suspects", "plants"],
+      additionalProperties: false
+    },
+    strict: true
   }
 ];

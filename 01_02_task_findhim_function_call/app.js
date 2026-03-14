@@ -56,6 +56,24 @@ const plantCoordsSchema = {
   }
 };
 
+const closestSuspectSchema = {
+  type: "json_schema",
+  name: "closest_suspect",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      surname: { type: "string" },
+      plant: { type: "string" },
+      plantCode: { type: "string" },
+      closestDistanceMeters: { type: "number" }
+    },
+    required: ["name", "surname", "plant", "plantCode", "closestDistanceMeters"],
+    additionalProperties: false
+  }
+};
+
 const reportSchema = {
   type: "json_schema",
   name: "investigation_report",
@@ -86,7 +104,7 @@ const main = async () => {
   const suspects = loadFromFile("suspects.json").answer;
   const plants = loadFromFile("findhim_locations.json").power_plants;
   
- /* console.log(`Found ${suspects.length} suspects.`);
+  console.log(`Found ${suspects.length} suspects.`);
   console.log(`Found ${Object.keys(plants).length} power plants.`);
 
   const plantsJson = JSON.stringify(
@@ -110,29 +128,36 @@ Suspects: ${suspectsJson}`, { ...config, text: { format: suspectLocationsSchema 
 Power plants:
 ${plantsJson}`, { ...config, text: { format: plantCoordsSchema } });
   saveOutput(step2, "step2_plant_coords.json");
-*/
 
-const step1 = loadFromFile("step1_suspect_locations.json");
-const step2 = loadFromFile("step2_plant_coords.json");
-console.log("Step 1 - suspect locations:", JSON.stringify(step1, null, 2));
-console.log("Step 2 - plant coordinates:", JSON.stringify(step2, null, 2));
-
-  // Step 3: compare distances, find the closest suspect, fetch their access level
-  const step3 = await processQuery(
-    `You are an investigator. Using the Haversine formula:
-1. Compare suspect locations with plant coordinates to find which suspect was ever closest to any plant.
-2. For that one suspect only, call fetchAccessLevel with { name, surname, born }.
-3. Return a report: { name, surname, plant, plantCode, closestDistanceMeters, accessLevel }
+  // Step 3a: find the closest suspect to any plant
+  const step3a = await processQuery(
+    `You are an investigator. You have suspect GPS locations and power plant GPS coordinates.
+Calculate which suspect was ever geographically closest to any power plant using precise spherical earth distance calculation.
+Return the result with the suspect's name, surname, nearest plant and distance.
 
 Suspect locations:
-${step1}
+${JSON.stringify(step1, null, 2)}
 
 Plant coordinates:
-${step2}`,
+${JSON.stringify(step2, null, 2)}`,
+    { ...config, text: { format: closestSuspectSchema } }
+  );
+  saveOutput(step3a, "step3a_closest_suspect.json");
+  console.log(`\nClosest suspect:\n${step3a}`);
+
+  const closest = typeof step3a === "string" ? JSON.parse(step3a) : step3a;
+  const suspectData = suspects.find(s => s.name === closest.name && s.surname === closest.surname);
+
+  // Step 3b: fetch access level for the identified suspect
+  const step3b = await processQuery(
+    `You are an investigator. You have identified the suspect closest to a power plant.
+Call fetchAccessLevel to retrieve their access level.
+
+Suspect: ${JSON.stringify({ name: closest.name, surname: closest.surname, born: suspectData?.born })}`,
     { ...config, text: { format: reportSchema } }
   );
- // saveOutput(step3, "step3_result.json");
-  console.log(`\nFinal result:\n${step3}`);
+  saveOutput(step3b, "step3b_result.json");
+  console.log(`\nFinal result:\n${step3b}`);
 };
 
 main().catch(console.error);
