@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Cezary",
+    "surname": "Żurek",
+    "accessLevel": {
+      "name": "Cezary",
+      "surname": "Żurek",
+      "accessLevel": 1
+    }
+  },
+  {
+    "name": "Jacek",
+    "surname": "Nowak",
+    "accessLevel": {
+      "name": "Jacek",
+      "surname": "Nowak",
+      "accessLevel": 1
+    }
+  },
+  {
+    "name": "Oskar",
+    "surname": "Sieradzki",
+    "accessLevel": {
+      "name": "Oskar",
+      "surname": "Sieradzki",
+      "accessLevel": 7
+    }
+  },
+  {
+    "name": "Wojciech",
+    "surname": "Bielik",
+    "accessLevel": {
+      "name": "Wojciech",
+      "surname": "Bielik",
+      "accessLevel": 7
+    }
+  },
+  {
+    "name": "Wacław",
+    "surname": "Jasiński",
+    "accessLevel": {
+      "name": "Wacław",
+      "surname": "Jasiński",
+      "accessLevel": 2
+    }
+  }
+]

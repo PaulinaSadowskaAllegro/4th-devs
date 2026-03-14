@@ -8,13 +8,14 @@ import {
   resolveModelForProvider
 } from "../config.js";
 import { extractResponseText } from "./helpers.js";
+import { fetchAccessLevel, fetchSuspectLocations } from "./locationApi.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const MODEL = resolveModelForProvider("openai/gpt-5-nano");
 
-async function saveOutput(output) {
-  const outputPath = join(__dirname, "output.json");
+async function saveOutput(output, filename) {
+  const outputPath = join(__dirname, filename);
   writeFileSync(outputPath, JSON.stringify(output, null, 2), "utf-8");
   console.log(`\nOutput saved to ${outputPath}`);
 }
@@ -33,19 +34,34 @@ async function verify() {
   console.log(`\nVerify response: ${JSON.stringify(verifyData, null, 2)}`);
 }
 
+function loadFromFile(filename) {
+  const path = join(__dirname, filename);
+  const content = readFileSync(path, "utf-8");
+  return JSON.parse(content);
+}
+
+async function buildSusLocationsFile() {
+  const suspects = loadFromFile("suspects.json").answer;
+  
+  console.log(`Found ${suspects.length} suspects.`);
+
+  const results = await Promise.all(
+    suspects.map(async (suspect, index) => {
+      console.log(suspect);
+      const accessLevel = await fetchAccessLevel(suspect);
+      const location = await fetchSuspectLocations(suspect);
+      console.log(`Suspect ${index + 1}: ${suspect.name} ${suspect.surname}, access level: ${JSON.stringify(accessLevel)}`);
+      return { name: suspect.name, surname: suspect.surname, accessLevel, location };
+    })
+  );
+
+  saveOutput(results, "susLocations.json");
+}
+
 async function main() {
-  const suspectsPath = join(__dirname, "suspects.json");
-  const content = readFileSync(suspectsPath, "utf-8");
-  const suspects = JSON.parse(content).answer;
-
-
-  console.log(`Found ${suspects.length} people matching criteria. Classifying in one batch call...`);
-
-  if (suspects.length > 50) {
-    console.log("Something sus, please verify!");
-    return;
-  }
-
+  // buildSusLocationsFile();
+  const susLocations = loadFromFile("susLocations.json");
+  const locations = loadFromFile("findhim_locations.json").power_plants;
 }
 
 main().catch((error) => {
