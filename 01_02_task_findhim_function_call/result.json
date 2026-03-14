@@ -3,5 +3,6 @@
   "surname": "Bielik",
   "plant": "Chelmno",
   "plantCode": "PWR2758PL",
-  "closestDistanceMeters": 843
+  "closestDistanceMeters": 843,
+  "accessLevel": "7"
 }

@@ -103,9 +103,6 @@ const config = {
 const main = async () => {
   const suspects = loadFromFile("suspects.json").answer;
   const plants = loadFromFile("findhim_locations.json").power_plants;
-  
-  console.log(`Found ${suspects.length} suspects.`);
-  console.log(`Found ${Object.keys(plants).length} power plants.`);
 
   const plantsJson = JSON.stringify(
     Object.entries(plants).map(([city, data]) => ({ city, code: data.code })),
@@ -116,48 +113,24 @@ const main = async () => {
     null, 2
   );
 
-const step1 = await processQuery(
-    `You are an investigator. Call fetchSuspectLocations once with the full "suspects" array below to get recorded GPS coordinates for all suspects.
+  const result = await processQuery(
+    `You are an investigator. Follow these steps in order:
 
-Suspects: ${suspectsJson}`, { ...config, text: { format: suspectLocationsSchema } });
-  saveOutput(step1, "step1_suspect_locations.json");
+1. Call fetchSuspectLocations with the full suspects array to get GPS locations for all suspects.
+2. Call fetchCityCoordinates with the full cities array to get GPS coordinates for all power plant cities.
+3. Call the distance-calculation tool with the suspect locations and plant coordinates to find the suspect who was ever closest to any plant.
+4. Call fetchAccessLevel for that one suspect (use their name, surname, and born year from the suspects list below).
+5. Return the final report.
 
-  // Step 2: fetch GPS coordinates for every power plant city
-  const step2 = await processQuery(
-    `Call fetchCityCoordinates once with the full "cities" array below to get GPS coordinates for all power plant cities.
-Power plants:
-${plantsJson}`, { ...config, text: { format: plantCoordsSchema } });
-  saveOutput(step2, "step2_plant_coords.json");
+Suspects (name, surname, born):
+${suspectsJson}
 
-  // Step 3a: find the closest suspect to any plant
-  const step3a = await processQuery(
-    `You are an investigator. You have suspect GPS locations and power plant GPS coordinates.
-Calculate which suspect was ever geographically closest to any power plant using precise spherical earth distance calculation.
-Return the result with the suspect's name, surname, nearest plant and distance.
-
-Suspect locations:
-${JSON.stringify(step1, null, 2)}
-
-Plant coordinates:
-${JSON.stringify(step2, null, 2)}`,
-    { ...config, text: { format: closestSuspectSchema } }
-  );
-  saveOutput(step3a, "step3a_closest_suspect.json");
-  console.log(`\nClosest suspect:\n${step3a}`);
-
-  const closest = typeof step3a === "string" ? JSON.parse(step3a) : step3a;
-  const suspectData = suspects.find(s => s.name === closest.name && s.surname === closest.surname);
-
-  // Step 3b: fetch access level for the identified suspect
-  const step3b = await processQuery(
-    `You are an investigator. You have identified the suspect closest to a power plant.
-Call fetchAccessLevel to retrieve their access level.
-
-Suspect: ${JSON.stringify({ name: closest.name, surname: closest.surname, born: suspectData?.born })}`,
+Power plants (city, code):
+${plantsJson}`,
     { ...config, text: { format: reportSchema } }
   );
-  saveOutput(step3b, "step3b_result.json");
-  console.log(`\nFinal result:\n${step3b}`);
+  saveOutput(result, "result.json");
+  console.log(`\nFinal result:\n${result}`);
 };
 
 main().catch(console.error);
