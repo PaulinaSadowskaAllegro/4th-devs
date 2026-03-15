@@ -1,5 +1,4 @@
-import { server, CHAT_PORT } from "./chatServer.js";
-import { checkPackage, redirectPackage } from "./packagesApi.js";
+import { server, CHAT_PORT } from "./src/chatServer.js";
 
 const sendChatMessage = async (sessionID, msg) => {
     const res = await fetch(`http://localhost:${CHAT_PORT}/api/chat`, {
@@ -13,11 +12,11 @@ const sendChatMessage = async (sessionID, msg) => {
 const main = async () => {
     const sessionID = "session-001";
 
-    const reply1 = await sendChatMessage(sessionID, "Hello, I need help with a package.");
-    console.log("Assistant:", reply1.msg);
-
     const reply2 = await sendChatMessage(sessionID, "Can you check the status of PKG12345678?");
     console.log("Assistant:", reply2.msg);
+
+    const reply3 = await sendChatMessage(sessionID, "Can you redirect it to 123 New Address St. with code REDIRECT123?");
+    console.log("Assistant:", reply3.msg);
 
     server.close();
 };
