@@ -1,43 +1,25 @@
-import { resolveModelForProvider } from "../config.js";
-import { PROXY_PORT, server } from "./proxy.js";
+import { server, CHAT_PORT } from "./chatServer.js";
+import { checkPackage, redirectPackage } from "./packagesApi.js";
 
-const PACKAGES_API = `http://localhost:${PROXY_PORT}/api/packages`;
-const API_KEY = process.env.AI_DEVS_API_KEY;
-
-const checkPackage = async (packageid) => {
-    const res = await fetch(PACKAGES_API, {
+const sendChatMessage = async (sessionID, msg) => {
+    const res = await fetch(`http://localhost:${CHAT_PORT}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apikey: API_KEY, action: "check", packageid }),
-    });
-    return res.json();
-};
-
-const redirectPackage = async (packageid, destination, code) => {
-    const res = await fetch(PACKAGES_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apikey: API_KEY, action: "redirect", packageid, destination, code }),
+        body: JSON.stringify({ sessionID, msg }),
     });
     return res.json();
 };
 
 const main = async () => {
-   server.listen(PROXY_PORT, () => {
-      console.log(`[proxy] Listening on http://localhost:${PROXY_PORT}/api/packages`);
-    });
-    
-    const packageId = "PKG12345678";
-/*
-    console.log("Checking package status...");
-    const status = await checkPackage(packageId);
-    console.log("Status:", JSON.stringify(status, null, 2));*/
+    const sessionID = "session-001";
 
-    const code = "security-code-1234"; 
-    const destination = "PWR3847PL";
-    console.log("Redirecting package...");
-    const redirect = await redirectPackage(packageId, destination, code);
-    console.log("Redirect confirmation:", JSON.stringify(redirect, null, 2));
+    const reply1 = await sendChatMessage(sessionID, "Hello, I need help with a package.");
+    console.log("Assistant:", reply1.msg);
+
+    const reply2 = await sendChatMessage(sessionID, "Can you check the status of PKG12345678?");
+    console.log("Assistant:", reply2.msg);
+
+    server.close();
 };
 
 main().catch(console.error);
