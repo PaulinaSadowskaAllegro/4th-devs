@@ -13,11 +13,11 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/api/chat") {
         const { sessionID, msg } = await readBody(req);
 
-        // console.log(`[chat] session=${sessionID} msg="${msg}"`);
+        console.log(`[chat] session=${sessionID} msg="${msg}"`);
 
         const reply = await chatWithAI(sessionID, msg);
 
-        // console.log(`[chat] session=${sessionID} reply="${reply}"`);
+        console.log(`[chat] session=${sessionID} reply="${reply}"`);
 
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ msg: reply }));
