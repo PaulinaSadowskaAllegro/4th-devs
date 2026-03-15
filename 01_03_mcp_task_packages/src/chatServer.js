@@ -28,8 +28,4 @@ const server = http.createServer(async (req, res) => {
     res.end("Not Found");
 });
 
-server.listen(CHAT_PORT, () => {
-    console.log(`[chat] Listening on http://localhost:${CHAT_PORT}/api/chat`);
-});
-
 export { server, CHAT_PORT };
