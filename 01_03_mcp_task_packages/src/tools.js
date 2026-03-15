@@ -6,7 +6,7 @@
  * The agent treats both identically via the unified handler map.
  */
 
-import { checkPackage, redirectPackage } from "./packagesApi.js";
+import { checkPackage, redirectPackage } from "./packagesApiMock.js";
 
 export const nativeTools = [
   {
