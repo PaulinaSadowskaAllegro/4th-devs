@@ -107,6 +107,7 @@ export async function fetchAccessLevel({ name, surname, born, apikey = process.e
     data = raw;
   }
 
+  console.log(`Access level API raw response: ${raw}`);
   if (!response.ok) {
     throw new Error(
       `Access level API error ${response.status}: ${typeof data === "string" ? data : JSON.stringify(data)}`
