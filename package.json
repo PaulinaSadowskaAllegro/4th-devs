@@ -33,6 +33,7 @@
     "lesson4:video": "node ./01_04_video/app.js",
     "prelesson4:generation": "npm run ensure:files-mcp",
     "lesson4:generation": "node ./01_04_generation/app.js",
+    "lesson4:sendit": "node ./01_04_sendit_task/app.js",
     "prelesson4:video_generation": "npm run ensure:files-mcp",
     "lesson4:video_generation": "node ./01_04_video_generation/app.js",
     "prelesson4:reports": "npm run ensure:files-mcp",

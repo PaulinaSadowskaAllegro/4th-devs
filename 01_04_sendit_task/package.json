@@ -1,0 +1,14 @@
+{
+  "name": "01_04_sendit_task",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

@@ -1,0 +1,29 @@
+import { readFile } from "fs/promises";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export async function verify(declaration) {
+  const answer = {
+    "declaration": declaration,
+  };
+  const output = { task: "sendit", answer: answer, apikey: process.env.AI_DEVS_API_KEY };
+  console.log(`\nSending to verify: ${JSON.stringify(output, null, 2)}`);
+  console.log(`\n${JSON.stringify(output, null, 2)}`);
+
+  const verifyResponse = await fetch("https://hub.ag3nts.org/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(output)
+  });
+
+  const verifyData = await verifyResponse.json();
+  console.log(`\nVerify response: ${JSON.stringify(verifyData, null, 2)}`);
+}
+
+export function loadFromFile(filename) {
+  const path = join(__dirname, filename);
+  const content = readFileSync(path, "utf-8");
+  return JSON.parse(content);
+}
