@@ -22,8 +22,13 @@ export async function verify(declaration) {
   console.log(`\nVerify response: ${JSON.stringify(verifyData, null, 2)}`);
 }
 
-export function loadFromFile(filename) {
+export async function loadFromFile(filename) {
   const path = join(__dirname, filename);
-  const content = readFileSync(path, "utf-8");
+  const content = await readFile(path, "utf-8");
   return JSON.parse(content);
+}
+
+export async function saveOutput(output, filename) {
+  const outputPath = join(__dirname, filename);
+  await writeFile(outputPath, JSON.stringify(output, null, 2), "utf-8");
 }
