@@ -1,3 +1,4 @@
+import { writeFileSync } from "fs";
 import { readFile } from "fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -30,5 +31,6 @@ export async function loadFromFile(filename) {
 
 export async function saveOutput(output, filename) {
   const outputPath = join(__dirname, filename);
-  await writeFile(outputPath, JSON.stringify(output, null, 2), "utf-8");
+  writeFileSync(outputPath, JSON.stringify(output, null, 2), "utf-8");
+  console.log(`\nOutput saved to ${outputPath}`);
 }

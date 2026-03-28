@@ -21,10 +21,10 @@ const main = async () => {
     console.log(`Native: ${nativeTools.map((tool) => tool.name).join(", ")}`);
 
     console.log("Starting image classification...");
-    const result = await run(CLASSIFICATION_QUERY, { mcpClient, mcpTools });
+    const result = await run(IMAGE_TEXT_RECOGNITION_QUERY, { mcpClient, mcpTools });
     console.log("Classification complete");
     console.log(result.response);
-    await saveOutput(result.response, "workspace/classification_result.json");
+    await saveOutput(result.response, "../workspace/excluded_routes.json");
   } catch (error) {
     throw error;
   } finally {
