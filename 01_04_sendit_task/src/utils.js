@@ -11,7 +11,6 @@ export async function verify(declaration) {
   };
   const output = { task: "sendit", answer: answer, apikey: process.env.AI_DEVS_API_KEY };
   console.log(`\nSending to verify: ${JSON.stringify(output, null, 2)}`);
-  console.log(`\n${JSON.stringify(output, null, 2)}`);
 
   const verifyResponse = await fetch("https://hub.ag3nts.org/verify", {
     method: "POST",
