@@ -32,7 +32,18 @@ export const postWithRetry = async (url, body) => {
       continue;
     }
 
-    return response.json();
+    const data = await response.json();
+
+    if (data.code === -985) {
+      const waitMs = ((data.retry_after ?? 10) + (data.penalty_seconds ?? 0)) * 1000;
+      console.log(`Rate limit hit (attempt ${attempt}/${MAX_RETRIES}): ${data.message}`);
+      console.log(`Waiting ${waitMs / 1000}s before retrying...`);
+      lastError = new Error(data.message);
+      if (attempt < MAX_RETRIES) await sleep(waitMs);
+      continue;
+    }
+
+    return data;
   }
 
   throw lastError;
