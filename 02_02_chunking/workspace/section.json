@@ -1,0 +1,11 @@
+{
+    "content": "\n**Conclusion:**\n\n* Don't write prompts alone. Work with the LLM to create them\n* Write a meta-prompt to help create other prompts\n* Use meta-prompts to generate sample data sets\n\n## What's next?\n\nIf you have to remember only one thing from this post, let it be the fact that currently LLM content generation occurs through **predicting the next token based on the content so far,** and always keep this in mind when working with models.\n\nMeanwhile, we'll be returning to the topic of Prompt Engineering many times. If you liked this post, please share it on your Social Media channels.\n\nHave fun,\nAdam\n",
+    "metadata": {
+        "strategy": "context",
+        "index": 29,
+        "chars": 603,
+        "section": "## What's next?",
+        "source": "workspace/example.md",
+        "context": "This conclusion summarizes key strategies for effective prompt creation with large language models and emphasizes the fundamental mechanism of token prediction, while hinting at future discussions on prompt engineering."
+    }
+}
